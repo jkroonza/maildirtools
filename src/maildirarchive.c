@@ -243,6 +243,7 @@ int main(int argc, char** argv)
 	struct stat st;
 	bool subscribe = false;
 	struct maildir_type_list* stype = NULL;
+	int archive_count = 0, archive_folder_count;
 
 	progname = *argv;
 
@@ -324,6 +325,8 @@ int main(int argc, char** argv)
 			sfd = dup(basefd);
 		}
 
+		archive_folder_count = 0;
+
 		for (const char * const *_sfn = subsources; *_sfn; ++_sfn) {
 			const char* sfn = *_sfn;
 			char *endptr;
@@ -372,6 +375,7 @@ int main(int argc, char** argv)
 					continue;
 				}
 
+				++archive_folder_count;
 				if (dry_run) {
 					printf("%s/%s/%s => %s/%s/%s/\n",
 							sourcename, sfn, de->d_name, base, tfname, sfn);
@@ -417,6 +421,9 @@ int main(int argc, char** argv)
 			}
 			closedir(dir); /* also closes cfd */
 		}
+		printf("%s: Archived %d emails.\n", sourcename, archive_folder_count);
+
+		archive_count += archive_folder_count;
 
 		get_folderfd(NULL, -1, NULL);
 
@@ -431,6 +438,8 @@ int main(int argc, char** argv)
 
 		maildir_type_list_free(stype);
 	}
+
+	printf("Archived %d emails total.\n", archive_count);
 
 	return 0;
 errout:
