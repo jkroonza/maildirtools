@@ -456,7 +456,7 @@ int check_path(const char* path)
 
 			if (de->d_type == DT_UNKNOWN) {
 				if (myfstatat(fd, de->d_name, &st, 0) < 0) {
-					printf("%s: %s.\n", de->d_name, strerror(errno));
+					printf("%s/%s: %s.\n", path, de->d_name, strerror(errno));
 					++ec;
 					continue;
 				}
@@ -465,14 +465,15 @@ int check_path(const char* path)
 			}
 
 			if (de->d_type != DT_DIR) {
-				printf("%s: Not a folder (.Name entries must be folders).\n", de->d_name);
+				printf("%s/%s: Not a folder (.Name entries must be folders).\n", path,
+						de->d_name);
 				++ec;
 				continue;
 			}
 
 			sfd = openat(fd, de->d_name, O_RDONLY);
 			if (sfd < 0) {
-				printf("%s: %s.\n", de->d_name, strerror(errno));
+				printf("%s/%s: %s.\n", path, de->d_name, strerror(errno));
 				continue;
 			}
 			ec += check_fdpath(sfd, de->d_name, uid, gid);
